@@ -1,4 +1,4 @@
-# Telegram Dedesign App
+# Telegram Chat App
 
 A new Flutter project.
 
