@@ -1,6 +1,8 @@
 # Telegram Chat App
 
-A new Flutter project.
+![alt text](https://github.com/MosesAyo/telegram/blob/main/assets/artboard/Main.png?raw=true)
+
+<!-- A new Flutter project. -->
 
 <!-- ## Getting Started
 
