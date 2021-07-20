@@ -11,7 +11,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Telegram',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        fontFamily: 'Gilroy',
       ),
       home: MyHomePage(),
     );
@@ -30,6 +30,7 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Center(
         child: Text(
           'Chat App',
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
         ),
       ),
     );
