@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:telegram/home/view.dart';
 
 void main() {
   runApp(MyApp());
@@ -12,27 +13,9 @@ class MyApp extends StatelessWidget {
       title: 'Telegram',
       theme: ThemeData(
         fontFamily: 'Gilroy',
+        highlightColor: Colors.black.withOpacity(0),
       ),
-      home: MyHomePage(),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Text(
-          'Chat App',
-          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
-        ),
-      ),
+      home: Home(),
     );
   }
 }
