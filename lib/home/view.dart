@@ -10,17 +10,24 @@ class Home extends StatefulWidget {
   _HomeState createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> {
+class _HomeState extends State<Home> with TickerProviderStateMixin {
   AppColor appColor = new AppColor();
   TabController? tabController;
+  GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey();
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
         child: Scaffold(
+            backgroundColor: Colors.white,
+            key: scaffoldKey,
             body: Column(
-      children: [customAppBar(), scrollingTabs()],
-    )));
+              children: [
+                customAppBar(),
+                // swipeCard(),
+                scrollingTabs()
+              ],
+            )));
   }
 
   Widget customAppBar() {
@@ -70,61 +77,69 @@ class _HomeState extends State<Home> {
       itemCount: _lastMessages.length,
       padding: EdgeInsets.symmetric(vertical: 30),
       itemBuilder: (context, index) {
-        return Container(
-          padding: EdgeInsets.symmetric(horizontal: 20),
-          child: Row(
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    image: DecorationImage(
-                      fit: BoxFit.cover,
-                      image: AssetImage(
-                          // 'assets/images/basketballguy.jpg'
-                          _lastMessages[index]['image']),
-                    )),
-                height: 72,
-                width: 72,
-              ),
-              SizedBox(width: 15),
-              Expanded(
-                  child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("${_lastMessages[index]['name']}",
-                      style: TextStyle(
-                          fontFamily: 'GilroyBold',
-                          // fontWeight: FontWeight.bold,
-                          fontSize: 23)),
-                  SizedBox(height: 5),
-                  Text("${_lastMessages[index]['lastMessage']}",
-                      style:
-                          TextStyle(color: appColor.primary(), fontSize: 16)),
-                ],
-              )),
-              Container(
-                  child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text('15:20', style: TextStyle(color: Colors.grey[600])),
-                  SizedBox(height: 5),
-                  Container(
-                    constraints: BoxConstraints(minWidth: 28),
-                    height: 28,
-                    padding: EdgeInsets.symmetric(horizontal: 10),
-                    decoration: BoxDecoration(
-                        color: appColor.primary(),
-                        borderRadius: BorderRadius.circular(100)),
-                    child: Center(
-                        child: Text('${index + 1}',
-                            style: TextStyle(color: Colors.white))),
-                  )
-                ],
-              )),
-            ],
-          ),
-        );
+        return Draggable(
+            affinity: Axis.horizontal,
+            feedbackOffset: Offset.fromDirection(0.1, 0.1),
+            axis: Axis.horizontal,
+            child: _contact(index),
+            feedback: Material(
+              child: _contact(index),
+            ),
+            childWhenDragging: swipeCard());
       },
+    );
+  }
+
+  Widget _contact(index) {
+    return Container(
+      color: Colors.white,
+      width: MediaQuery.of(context).size.width,
+      padding: EdgeInsets.symmetric(horizontal: 20),
+      child: Row(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(26),
+                image: DecorationImage(
+                  fit: BoxFit.cover,
+                  image: AssetImage(_lastMessages[index]['image']),
+                )),
+            height: 72,
+            width: 72,
+          ),
+          SizedBox(width: 15),
+          Expanded(
+              child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("${_lastMessages[index]['name']}",
+                  style: TextStyle(fontFamily: 'GilroyBold', fontSize: 23)),
+              SizedBox(height: 5),
+              Text("${_lastMessages[index]['lastMessage']}",
+                  style: TextStyle(color: appColor.primary(), fontSize: 16)),
+            ],
+          )),
+          Container(
+              child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text('15:20', style: TextStyle(color: Colors.grey[600])),
+              SizedBox(height: 5),
+              Container(
+                constraints: BoxConstraints(minWidth: 28),
+                height: 28,
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                decoration: BoxDecoration(
+                    color: appColor.primary(),
+                    borderRadius: BorderRadius.circular(100)),
+                child: Center(
+                    child: Text('${index + 1}',
+                        style: TextStyle(color: Colors.white))),
+              )
+            ],
+          )),
+        ],
+      ),
     );
   }
 
@@ -169,84 +184,121 @@ class _HomeState extends State<Home> {
             )));
   }
 
+  Widget swipeCard() {
+    return Container(
+        height: 72,
+        width: MediaQuery.of(context).size.width,
+        color: appColor.primary(),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Container(
+                // color: Colors.yellow,
+                height: 72,
+                width: MediaQuery.of(context).size.width * 0.55,
+                child: Row(
+                  children: [
+                    Expanded(
+                        child: GestureDetector(
+                      onTap: () {
+                        print('object 1');
+                      },
+                      child: Container(
+                          padding: EdgeInsets.symmetric(vertical: 25),
+                          height: 72,
+                          color: appColor.primary(),
+                          child: SvgPicture.asset('assets/svg/Archive.svg')),
+                    )),
+                    Expanded(
+                        child: GestureDetector(
+                      onTap: () {
+                        print('object 2');
+                      },
+                      child: Container(
+                          padding: EdgeInsets.symmetric(vertical: 28),
+                          height: 72,
+                          // constraints: BoxConstraints(maxWidth: 28),
+                          color: appColor.primary(),
+                          child:
+                              SvgPicture.asset('assets/svg/Double-tick.svg')),
+                    )),
+                    Expanded(
+                        child: GestureDetector(
+                      onTap: () {
+                        print('object 3');
+                      },
+                      child: Container(
+                          padding: EdgeInsets.symmetric(vertical: 25),
+                          height: 72,
+                          color: appColor.primary(),
+                          child: SvgPicture.asset('assets/svg/Delete.svg')),
+                    )),
+                  ],
+                ))
+          ],
+        ));
+  }
+
   List _lastMessages = [
     {
       "name": "Sherlock Holmes",
-      "image": "assets/images/basketballguy.jpg",
+      "image": "assets/images/sample1.jpg",
       "unread": "5",
       "lastMessage": "So you're coming home today?"
     },
     {
       "name": "Sherlock Holmes",
-      "image": "assets/images/basketballguy.jpg",
+      "image": "assets/images/sample2.jpg",
       "unread": "5",
       "lastMessage": "So you're coming home today?"
     },
     {
       "name": "Sherlock Holmes",
-      "image": "assets/images/basketballguy.jpg",
+      "image": "assets/images/sample3.jpg",
       "unread": "5",
       "lastMessage": "So you're coming home today?"
     },
     {
       "name": "Sherlock Holmes",
-      "image": "assets/images/basketballguy.jpg",
+      "image": "assets/images/sample4.png",
       "unread": "5",
       "lastMessage": "So you're coming home today?"
     },
     {
       "name": "Sherlock Holmes",
-      "image": "assets/images/basketballguy.jpg",
+      "image": "assets/images/sample5.png",
       "unread": "5",
       "lastMessage": "So you're coming home today?"
     },
     {
       "name": "Sherlock Holmes",
-      "image": "assets/images/basketballguy.jpg",
+      "image": "assets/images/sample6.jpg",
       "unread": "5",
       "lastMessage": "So you're coming home today?"
     },
     {
       "name": "Sherlock Holmes",
-      "image": "assets/images/basketballguy.jpg",
+      "image": "assets/images/sample7.jpg",
       "unread": "5",
       "lastMessage": "So you're coming home today?"
     },
     {
       "name": "Sherlock Holmes",
-      "image": "assets/images/basketballguy.jpg",
+      "image": "assets/images/sample8.jpg",
       "unread": "5",
       "lastMessage": "So you're coming home today?"
     },
     {
       "name": "Sherlock Holmes",
-      "image": "assets/images/basketballguy.jpg",
+      "image": "assets/images/sample9.jpg",
       "unread": "5",
       "lastMessage": "So you're coming home today?"
     },
     {
       "name": "Sherlock Holmes",
-      "image": "assets/images/basketballguy.jpg",
+      "image": "assets/images/sample10.jpg",
       "unread": "5",
       "lastMessage": "So you're coming home today?"
-    },
-    {
-      "name": "Sherlock Holmes",
-      "image": "assets/images/basketballguy.jpg",
-      "unread": "5",
-      "lastMessage": "So you're coming home today?"
-    },
-    {
-      "name": "Sherlock Holmes",
-      "image": "assets/images/basketballguy.jpg",
-      "unread": "5",
-      "lastMessage": "So you're coming home today?"
-    },
-    {
-      "name": "Sherlock Holmes",
-      "image": "assets/images/basketballguy.jpg",
-      "unread": "5",
-      "lastMessage": "So you're coming home today?"
-    },
+    }
   ];
 }
