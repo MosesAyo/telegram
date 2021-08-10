@@ -70,6 +70,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
         ));
   }
 
+  double dragPosition = 0.0;
   Widget contactList() {
     return ListView.separated(
       physics: BouncingScrollPhysics(),
@@ -77,15 +78,82 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
       itemCount: _lastMessages.length,
       padding: EdgeInsets.symmetric(vertical: 30),
       itemBuilder: (context, index) {
-        return Draggable(
-            affinity: Axis.horizontal,
-            feedbackOffset: Offset.fromDirection(0.1, 0.1),
-            axis: Axis.horizontal,
-            child: _contact(index),
-            feedback: Material(
-              child: _contact(index),
-            ),
-            childWhenDragging: swipeCard());
+        return GestureDetector(
+          onTap: () {
+            // reset position
+          },
+          onHorizontalDragStart: (drag) {
+            print('start');
+            print(drag);
+            print(drag.sourceTimeStamp);
+          },
+          onHorizontalDragUpdate: (update) {
+            print('update');
+            print(update);
+            print(update.sourceTimeStamp);
+            // check if drag is to the left
+            if (dragPosition <= 0.0) {
+              if (dragPosition == 0 && update.primaryDelta! <= 0) {
+                // do nothing
+                setState(() {
+                  dragPosition = dragPosition + update.primaryDelta!.toDouble();
+                });
+              } else {
+                setState(() {
+                  dragPosition = dragPosition + update.primaryDelta!.toDouble();
+                });
+              }
+              print(update.primaryDelta);
+            } else {
+              setState(() {
+                dragPosition = 0.0;
+              });
+            }
+          },
+          onHorizontalDragEnd: (ended) {
+            // print(ended.);
+          },
+          child: Stack(
+            children: [
+              swipeCard(),
+              Container(
+                child: Transform.translate(
+                    offset: Offset(dragPosition, 0.0), child: _contact(index)),
+              )
+            ],
+          ),
+        );
+        // Stack(
+        //   children: [
+        //     swipeCard(),
+        //     Container(
+        //       child: Transform.translate(
+        //           offset: Offset(100, 0.0), child: _contact(index)),
+        //     )
+        //   ],
+        // );
+        // Draggable(
+        //     onDragStarted: () {},
+        //     onDragUpdate: (update) {
+        //       print(update.globalPosition.dx);
+        //       print(update.globalPosition);
+        //       print(update.);
+        //     },
+        //     affinity: Axis.horizontal,
+        //     axis: Axis.horizontal,
+        //     child: Stack(
+        //       children: [
+        //         swipeCard(),
+        //         Container(
+        //           child: Transform.translate(
+        //               offset: Offset(-233, 0.0), child: _contact(index)),
+        //         )
+        //       ],
+        //     ),
+        //     feedback: Material(
+        //       child: _contact(index),
+        //     ),
+        //     childWhenDragging: swipeCard());
       },
     );
   }
