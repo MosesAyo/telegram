@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:telegram/chat/view.dart';
 import 'package:telegram/colors/colors.dart';
 
 class Home extends StatefulWidget {
@@ -14,6 +15,20 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
   AppColor appColor = new AppColor();
   TabController? tabController;
   GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey();
+  AnimationController? _controller;
+
+  @override
+  initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+    );
+    _controller!.duration = Duration(seconds: 2);
+    _controller!.addListener(() => setState(() {}));
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
+      _controller!.forward();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -78,137 +93,156 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
       itemCount: _lastMessages.length,
       padding: EdgeInsets.symmetric(vertical: 30),
       itemBuilder: (context, index) {
-        return GestureDetector(
-          onTap: () {
-            // reset position
-          },
-          onHorizontalDragStart: (drag) {
-            print('start');
-            print(drag);
-            print(drag.sourceTimeStamp);
-          },
-          onHorizontalDragUpdate: (update) {
-            print('update');
-            print(update);
-            print(update.sourceTimeStamp);
-            // check if drag is to the left
-            if (dragPosition <= 0.0) {
-              if (dragPosition == 0 && update.primaryDelta! <= 0) {
-                // do nothing
-                setState(() {
-                  dragPosition = dragPosition + update.primaryDelta!.toDouble();
-                });
-              } else {
-                setState(() {
-                  dragPosition = dragPosition + update.primaryDelta!.toDouble();
-                });
-              }
-              print(update.primaryDelta);
-            } else {
-              setState(() {
-                dragPosition = 0.0;
-              });
-            }
-          },
-          onHorizontalDragEnd: (ended) {
-            // print(ended.);
-          },
-          child: Stack(
-            children: [
-              swipeCard(),
-              Container(
-                child: Transform.translate(
-                    offset: Offset(dragPosition, 0.0), child: _contact(index)),
-              )
-            ],
-          ),
+        return Stack(
+          children: [
+            swipeCard(),
+            _contact(index),
+            // Draggable(
+            //     onDragStarted: () {},
+            //     onDragUpdate: (update) {
+            //       print(update.globalPosition.dx);
+            //       print(update.globalPosition);
+            //       // print(update.);
+            //     },
+            //     affinity: Axis.horizontal,
+            //     axis: Axis.horizontal,
+            //     child: Stack(
+            //       children: [
+            //         swipeCard(),
+            //         Container(
+            //           child: Transform.translate(
+            //               offset: Offset(-233, 0.0), child: _contact(index)),
+            //         )
+            //       ],
+            //     ),
+            //     feedback: Material(
+            //       child: _contact(index),
+            //     ),
+            //     childWhenDragging: swipeCard())
+          ],
         );
-        // Stack(
-        //   children: [
-        //     swipeCard(),
-        //     Container(
-        //       child: Transform.translate(
-        //           offset: Offset(100, 0.0), child: _contact(index)),
-        //     )
-        //   ],
-        // );
-        // Draggable(
-        //     onDragStarted: () {},
-        //     onDragUpdate: (update) {
-        //       print(update.globalPosition.dx);
-        //       print(update.globalPosition);
-        //       print(update.);
-        //     },
-        //     affinity: Axis.horizontal,
-        //     axis: Axis.horizontal,
-        //     child: Stack(
-        //       children: [
-        //         swipeCard(),
-        //         Container(
-        //           child: Transform.translate(
-        //               offset: Offset(-233, 0.0), child: _contact(index)),
-        //         )
-        //       ],
-        //     ),
-        //     feedback: Material(
-        //       child: _contact(index),
-        //     ),
-        //     childWhenDragging: swipeCard());
       },
     );
   }
 
   Widget _contact(index) {
-    return Container(
-      color: Colors.white,
-      width: MediaQuery.of(context).size.width,
-      padding: EdgeInsets.symmetric(horizontal: 20),
-      child: Row(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(26),
-                image: DecorationImage(
-                  fit: BoxFit.cover,
-                  image: AssetImage(_lastMessages[index]['image']),
-                )),
-            height: 72,
-            width: 72,
-          ),
-          SizedBox(width: 15),
-          Expanded(
-              child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text("${_lastMessages[index]['name']}",
-                  style: TextStyle(fontFamily: 'GilroyBold', fontSize: 23)),
-              SizedBox(height: 5),
-              Text("${_lastMessages[index]['lastMessage']}",
-                  style: TextStyle(color: appColor.primary(), fontSize: 16)),
-            ],
-          )),
-          Container(
-              child: Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text('15:20', style: TextStyle(color: Colors.grey[600])),
-              SizedBox(height: 5),
-              Container(
-                constraints: BoxConstraints(minWidth: 28),
-                height: 28,
-                padding: EdgeInsets.symmetric(horizontal: 10),
-                decoration: BoxDecoration(
-                    color: appColor.primary(),
-                    borderRadius: BorderRadius.circular(100)),
-                child: Center(
-                    child: Text('${index + 1}',
-                        style: TextStyle(color: Colors.white))),
-              )
-            ],
-          )),
-        ],
-      ),
-    );
+    return AnimatedPositioned(
+        key: ObjectKey(index),
+        duration: Duration(milliseconds: 300),
+        left: dragPosition,
+        child: GestureDetector(
+            onTap: () {
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => Chat()));
+            },
+            onHorizontalDragStart: (drag) {
+              setState(() {});
+              // print('start');
+              // print(dragPosition);
+              // print(drag);
+              // print(drag.sourceTimeStamp);
+            },
+            onHorizontalDragUpdate: (update) {
+              setState(() {});
+              // print('update');
+              // print(update);
+              // print(update.sourceTimeStamp);
+              // check if drag is to the left
+              if (dragPosition <= 0.0) {
+                if (dragPosition == 0 && update.primaryDelta! <= 0) {
+                  // do nothing
+                  setState(() {
+                    dragPosition =
+                        dragPosition + update.primaryDelta!.toDouble();
+                  });
+                } else {
+                  setState(() {
+                    dragPosition =
+                        dragPosition + update.primaryDelta!.toDouble();
+                  });
+                }
+                // print(update.primaryDelta);
+              } else {
+                setState(() {
+                  dragPosition = 0.0;
+                  _controller!.animateTo(0.1);
+                });
+              }
+            },
+            onHorizontalDragEnd: (ended) {
+              // print(ended);
+              // print('dragPosition');
+              // print(dragPosition);
+              if (dragPosition > 0) {
+                setState(() {
+                  // dragPosition = -(MediaQuery.of(context).size.width * 0.55);
+                  dragPosition = 0.0;
+                  _controller!.animateTo(0.0);
+                });
+              }
+              if (dragPosition < -(MediaQuery.of(context).size.width * 0.275)) {
+                setState(() {
+                  dragPosition = -(MediaQuery.of(context).size.width * 0.55);
+                });
+              }
+              if (dragPosition > -(MediaQuery.of(context).size.width * 0.275)) {
+                setState(() {
+                  dragPosition = 0.0;
+                });
+              }
+            },
+            child: Container(
+              color: Colors.white,
+              width: MediaQuery.of(context).size.width,
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(26),
+                        image: DecorationImage(
+                          fit: BoxFit.cover,
+                          image: AssetImage(_lastMessages[index]['image']),
+                        )),
+                    height: 72,
+                    width: 72,
+                  ),
+                  SizedBox(width: 15),
+                  Expanded(
+                      child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("${_lastMessages[index]['name']}",
+                          style: TextStyle(
+                              fontFamily: 'GilroyBold', fontSize: 23)),
+                      SizedBox(height: 5),
+                      Text("${_lastMessages[index]['lastMessage']}",
+                          style: TextStyle(
+                              color: appColor.primary(), fontSize: 16)),
+                    ],
+                  )),
+                  Container(
+                      child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text('15:20', style: TextStyle(color: Colors.grey[600])),
+                      SizedBox(height: 5),
+                      Container(
+                        constraints: BoxConstraints(minWidth: 28),
+                        height: 28,
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        decoration: BoxDecoration(
+                            color: appColor.primary(),
+                            borderRadius: BorderRadius.circular(100)),
+                        child: Center(
+                            child: Text('${index + 1}',
+                                style: TextStyle(color: Colors.white))),
+                      )
+                    ],
+                  )),
+                ],
+              ),
+            )));
   }
 
   Widget scrollingTabs() {
